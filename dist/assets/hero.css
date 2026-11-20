@@ -63,3 +63,26 @@
 }
 @media(max-width:360px){.craving-headline{font-size:48px}.craving-caption{left:15px;right:15px}.craving-name{font-size:27px}.craving-note{font-size:11px}.craving-top p{max-width:120px}.craving-top{align-items:start}.craving-stage{inset:178px 0 215px}}
 @media(prefers-reduced-motion:reduce){.craving-cursor{display:none}.craving-hero{animation:none;transition:none}.craving-treat img,.treat-model{will-change:auto}.treat-depth,.treat-glint{display:none}}
+
+/* Touch devices have no hover: offer a dedicated, two-axis product interaction. */
+.craving-touch-controls{display:none}
+.craving-stage.is-inspecting{touch-action:none;cursor:grabbing}
+.craving-treat{touch-action:inherit;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.flight-product .treat-model{backface-visibility:hidden}
+@media(hover:none),(pointer:coarse){
+ .craving-touch-controls{position:absolute;bottom:112px;left:20px;right:20px;z-index:6;display:flex;align-items:center;justify-content:center;gap:10px}
+ .craving-roll-toggle{min-height:44px;padding:9px 15px;border:1px solid #6b4b3e66;border-radius:24px;background:#f8f4ede6;color:var(--cocoa);font:500 12px Inter,sans-serif;white-space:nowrap;touch-action:manipulation}
+ .craving-roll-toggle[aria-pressed=true]{background:var(--brown);color:var(--cream)}
+ .craving-touch-hint{font:400 11px/1.4 Inter,sans-serif;color:var(--brown);max-width:155px}
+ .craving-caption{bottom:174px}.craving-actions{bottom:57px}
+ .craving-stage{bottom:256px}
+ .craving-cursor{display:none}
+ .craving-treat:after{filter:blur(7px)}
+ .flight-product img{filter:none}
+}
+@media(hover:none) and (max-width:650px),(pointer:coarse) and (max-width:650px){
+ .craving-hero{min-height:710px;height:calc(100svh - 114px);max-height:930px}
+ .craving-stage{inset:166px 0 265px}.craving-treat{min-height:220px;top:48%}
+ .craving-orbit{top:41%}
+}
+@media(prefers-reduced-motion:reduce){.craving-touch-controls{display:none}.craving-caption{bottom:136px}.craving-stage{bottom:207px}}

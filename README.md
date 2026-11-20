@@ -23,3 +23,7 @@ The corrected Biscoff mug cake and fudge cheesecake assets are listed in ASSETS.
 ## Netlify and GitHub
 
 This is a static site. Use production branch `main`, leave the build command empty, and set publish directory to `dist`. The included netlify.toml configures the publish directory, and dist/_redirects supplies the client-route fallback. Upload the clean export package to your own repository; it omits this preview site's Git history and hosting identity.
+
+## Touch controls
+
+On phones and tablets, swipe to glide between products and tap a product to open it. Choose **Roll this treat** to drag the selected product on both axes independently; choose **Explore carousel** to return to swiping. Horizontal swipes roll the grabbed product and settle with momentum. Vertical page scrolling stays available in explore mode. Opening and returning use an uninterrupted product zoom, a circular background reveal, and staggered content reveals without a full page load. The phone's reduced-motion preference is respected. Motion assets use versioned URLs so existing visitors receive updates.

@@ -21,7 +21,7 @@
 
   function navigate(href) {
     const link = [...document.querySelectorAll('#root a[href]')].find(a => !a.closest('.motion-home') && a.getAttribute('href') === href);
-    if (link) link.click(); else location.assign(href);
+    if (link) link.click(); else { history.pushState({}, '', href); dispatchEvent(new PopStateEvent('popstate')); }
   }
 
   window.enhanceCrumbsProduct = () => {
@@ -56,9 +56,9 @@
     if (opening) return;
     opening = true;
     if (reduced.matches || !source) { navigate(href); opening = false; return; }
-    const link=source.closest('.craving-treat'), bounds=source.getBoundingClientRect();
-    let origin, startTransform='none';
-    let model;
+    const returning=href==='/', link=source.closest('.craving-treat');
+    const bounds=source.getBoundingClientRect();
+    let origin, startTransform='none', model;
     if(link) {
       const stage=link.parentElement.getBoundingClientRect();
       origin={left:stage.left+link.offsetLeft,top:stage.top+link.offsetTop,width:link.offsetWidth,height:link.offsetHeight};
@@ -69,9 +69,8 @@
       model=document.createElement('span');model.className='treat-model';
       const picture=document.createElement('img');picture.src=source.src;picture.alt='';model.append(picture);
     }
-    const curtain = document.createElement('div');
-    curtain.className = 'treat-transition';
-    curtain.setAttribute('aria-hidden','true');
+    model.querySelectorAll('.sauce-pour,.treat-depth,.treat-glint').forEach(node=>node.remove());
+    const curtain=document.createElement('div');curtain.className='treat-transition';curtain.setAttribute('aria-hidden','true');
     const surface=document.createElement('div');surface.className='flight-curtain';surface.style.background=treat.tint;
     const ghost=document.createElement('div');ghost.className='flight-product';ghost.append(model);
     Object.assign(ghost.style,{left:origin.left+'px',top:origin.top+'px',width:origin.width+'px',height:origin.height+'px',transform:startTransform});
@@ -80,37 +79,48 @@
     const hiddenSource=link?.querySelector('.treat-model')||source;
     hiddenSource.style.visibility='hidden';
     const point=`${bounds.left+bounds.width/2}px ${bounds.top+bounds.height/2}px`;
-    surface.animate([{clipPath:`circle(20px at ${point})`},{clipPath:`circle(${Math.hypot(innerWidth,innerHeight)}px at ${point})`}],{duration:600,easing:'cubic-bezier(.22,.8,.25,1)',fill:'forwards'});
-    const liftTransform=`translate3d(${innerWidth/2-origin.left-origin.width/2}px,${innerHeight*.46-origin.top-origin.height/2}px,0) rotate(-6deg) scale(${Math.min(innerWidth*.86,620)/Math.min(origin.width,origin.height)})`;
-    const lift=ghost.animate([{transform:startTransform},{transform:liftTransform}],{duration:420,easing:'cubic-bezier(.22,.7,.25,1)',fill:'forwards'});
-    const modelStart=getComputedStyle(model).transform;
-    model.animate([{transform:modelStart},{transform:'perspective(900px) rotateX(0deg) rotateY(-12deg) rotateZ(-8deg)'},{transform:'perspective(900px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'}],{duration:1080,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
-    document.querySelectorAll('.craving-headline,.craving-caption,.craving-actions,.craving-top').forEach((node,i)=>node.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:`translateY(${-20-i*6}px)`}],{duration:250,fill:'forwards'}));
-    let destination;
+    const animations=[];
+    const play=(node,frames,options)=>{const animation=node.animate(frames,options);animations.push(animation);return animation;};
+    const easing='cubic-bezier(.22,1,.36,1)';
+    play(surface,[{clipPath:`circle(0px at ${point})`},{clipPath:`circle(${Math.hypot(innerWidth,innerHeight)}px at ${point})`}],{duration:540,easing,fill:'forwards'});
+    // Keep moving while the next route mounts, without a page load or a frozen zoom.
+    const peakSize=Math.min(innerWidth*.93,innerHeight*.55,620);
+    const peak=`translate3d(${innerWidth/2-origin.left-origin.width/2}px,${innerHeight*.43-origin.top-origin.height/2}px,0) rotate(${returning?7:-7}deg) scale(${peakSize/Math.min(origin.width,origin.height)})`;
+    const lift=play(ghost,[{transform:startTransform},{transform:peak}],{duration:620,easing:'cubic-bezier(.2,.7,.2,1)',fill:'forwards'});
+    play(model,[{transform:getComputedStyle(model).transform},{transform:'perspective(900px) rotateY(-14deg) rotateZ(-5deg)',offset:.42},{transform:'perspective(900px) rotateY(0deg) rotateZ(0deg)'}],{duration:1220,easing,fill:'forwards'});
+    const outgoing=returning?document.querySelectorAll('[class*="_details_5zv75_"] > *,.back-to-cravings'):document.querySelectorAll('.craving-headline,.craving-caption,.craving-actions,.craving-top,.craving-touch-controls');
+    outgoing.forEach(node=>play(node,[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-18px)'}],{duration:220,fill:'forwards'}));
+    let destination, hiddenDestination;
     try {
-      await delay(300);
-      navigate(href); window.scrollTo({top:0,behavior:'instant'});
-      for(let n=0;n<60;n++) {
+      await delay(220);
+      navigate(href);window.scrollTo({top:0,behavior:'instant'});
+      for(let n=0;n<80;n++) {
         window.enhanceCrumbsProduct();
-        destination = href==='/'?document.querySelector(`.craving-treat[data-treat="${treats.indexOf(treat)}"] .treat-front`):document.querySelector('.cutout-product');
-        if (location.pathname === href && destination) {destination.style.visibility='hidden';break;}
-        await delay(20);
+        destination=returning?document.querySelector(`.craving-treat[data-treat="${treats.indexOf(treat)}"] .treat-front`):document.querySelector('.cutout-product');
+        if(location.pathname===href&&destination) {
+          hiddenDestination=returning?destination.closest('.treat-model'):destination;
+          hiddenDestination.style.visibility='hidden';break;
+        }
+        destination=null;await delay(16);
       }
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-      await lift.finished;
-      if (destination) {
-        await Promise.race([destination.decode().catch(()=>{}),delay(1000)]);
+      if(destination) {
+        await Promise.race([destination.decode().catch(()=>{}),delay(500)]);
+        // Read the current zoom rather than waiting for it to stop at its peak.
+        const current=getComputedStyle(ghost).transform;
+        lift.cancel();ghost.style.transform=current;
         const end=contentBox(destination);
         const scale=Math.min(end.width,end.height)/Math.min(origin.width,origin.height);
-        const endTransform=`translate3d(${end.left+end.width/2-origin.left-origin.width/2}px,${end.top+end.height/2-origin.top-origin.height/2}px,0) scale(${scale})`;
-        const flight=ghost.animate([{transform:liftTransform},{transform:endTransform}],{duration:760,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
-        surface.animate([{opacity:1},{opacity:0}],{duration:520,delay:120,fill:'forwards'});
-        const content=href==='/'?document.querySelectorAll('.craving-headline,.craving-caption,.craving-actions,.craving-top'):document.querySelectorAll('[class*="_details_5zv75_"] > *, .back-to-cravings');
-        content.forEach((node,i)=>node.animate([{opacity:0,transform:'translateY(28px)'},{opacity:1,transform:'translateY(0)'}],{duration:680,delay:100+Math.min(i,5)*65,easing:'cubic-bezier(.22,1,.36,1)',fill:'both'}));
+        const finish=`translate3d(${end.left+end.width/2-origin.left-origin.width/2}px,${end.top+end.height/2-origin.top-origin.height/2}px,0) scale(${scale})`;
+        const flight=play(ghost,[{transform:current},{transform:peak,offset:.24},{transform:finish}],{duration:920,easing,fill:'forwards'});
+        play(surface,[{opacity:1},{opacity:0}],{duration:600,delay:160,easing,fill:'forwards'});
+        const content=returning?document.querySelectorAll('.craving-headline,.craving-top,.craving-caption,.craving-actions,.craving-touch-controls'):document.querySelectorAll('.back-to-cravings,[class*="_details_5zv75_"] > *');
+        content.forEach((node,i)=>play(node,[{opacity:0,transform:'translateY(22px)'},{opacity:1,transform:'translateY(0)'}],{duration:620,delay:160+Math.min(i,5)*60,easing,fill:'both'}));
         await flight.finished;
       }
     } finally {
-      hiddenSource.style.visibility='';if(destination)destination.style.visibility='';
+      hiddenSource.style.visibility='';if(hiddenDestination)hiddenDestination.style.visibility='';
+      animations.forEach(animation=>animation.cancel());
       curtain.remove();document.documentElement.classList.remove('treat-is-opening');opening=false;
     }
   }
@@ -129,6 +139,7 @@
         </div>
         <div class="craving-caption" aria-live="polite" aria-atomic="true"><p class="craving-category"></p><h2 class="craving-name"></h2><p class="craving-note"></p></div>
         <div class="craving-actions"><a class="craving-discover bakery-button" href="/product/${treats[0].id}">Discover this treat <span>₹149</span></a><button class="craving-add" type="button">Add to box</button></div>
+        <div class="craving-touch-controls"><button type="button" class="craving-roll-toggle" aria-pressed="false">Roll this treat</button><span class="craving-touch-hint">Swipe to explore · tap to open</span></div>
         <div class="craving-bottom"><p><span class="drag-symbol" aria-hidden="true">↔</span> Drag to explore <span class="desktop-hint">· move over a treat to roll it</span></p><div class="craving-pagination" aria-label="Choose a treat">${treats.map((t,i)=>`<button type="button" aria-label="Show ${t.name}" aria-pressed="${i===0}" data-slide="${i}"><span></span></button>`).join('')}</div><a href="#bestsellers">More sweet things below</a></div>
         <div class="craving-cursor" aria-hidden="true"><span>Open<br>treat</span></div>
       </section>
@@ -147,7 +158,15 @@
     const glide={value:position,velocity:0};
     let frame, previousTime=0, active=true, down=false, moved=false, startX=0, startY=0, dragOrigin=0;
     let velocity=0, lastX=0, lastMoveTime=0, suppressClickUntil=0, wheelTimer;
-    let hovered=-1, grabbed=-1, dragRoll=0, hasRendered=false;
+    let hovered=-1, grabbed=-1, dragRoll=0, hasRendered=false, inspecting=false, activePointer=null;
+    const rollToggle=section.querySelector('.craving-roll-toggle');
+    const touchHint=section.querySelector('.craving-touch-hint');
+    rollToggle.addEventListener('click',()=>{
+      inspecting=!inspecting;stage.classList.toggle('is-inspecting',inspecting);
+      rollToggle.setAttribute('aria-pressed',String(inspecting));
+      rollToggle.textContent=inspecting?'Explore carousel':'Roll this treat';
+      touchHint.textContent=inspecting?'Drag the treat to roll & tilt · tap to open':'Swipe to explore · tap to open';
+    });
     let captionAnimation;
     const cursorText=cursor.querySelector('span');let lastCursorText='';
     const spacing=()=>innerWidth<=650?Math.min(innerWidth*.62,280):Math.min(innerWidth*.36,550);
@@ -160,7 +179,7 @@
     links.forEach((link,i)=>link.addEventListener('focus',()=>select(i)));
     const cursorMove=event=> {
       const hit=event.target.closest('.craving-treat');
-      if(!down) {
+      if(!down && event.pointerType==='mouse') {
         hovered=hit?Number(hit.dataset.treat):-1;
         rotations.forEach((r,i)=>{if(i!==hovered){r.tx=0;r.ty=0;r.tz=0;}});
         if(hovered>=0) {
@@ -178,42 +197,50 @@
       }
     };
     stage.addEventListener('pointerdown',event=>{
-      if(event.button!==0) return;
-      down=true;moved=false;startX=lastX=event.clientX;startY=event.clientY;dragOrigin=target;velocity=0;lastMoveTime=performance.now();
-      const hit=event.target.closest('.craving-treat');grabbed=hit?Number(hit.dataset.treat):-1;
+      if(event.button!==0 || down || opening || !event.isPrimary) return;
+      activePointer=event.pointerId;
+      down=true;moved=false;startX=lastX=event.clientX;startY=event.clientY;dragOrigin=glide.value;target=glide.value;glide.velocity=0;velocity=0;lastMoveTime=performance.now();
+      const hit=event.target.closest('.craving-treat');grabbed=hit?Number(hit.dataset.treat):(inspecting?mod(Math.round(target)):-1);
+      if(event.pointerType!=='mouse'&&grabbed>=0){rotations[grabbed].tx=-8;rotations[grabbed].ty=12;}
       dragRoll=grabbed>=0?rotations[grabbed].z.value:0;
       stage.classList.add('is-dragging');
     });
     stage.addEventListener('pointermove',event=>{
       cursorMove(event);
-      if(!down)return;
+      if(!down || event.pointerId!==activePointer)return;
       const dx=event.clientX-startX,dy=event.clientY-startY;
-      if(!moved && Math.abs(dy)>Math.abs(dx) && Math.abs(dy)>12 && event.pointerType==='touch') {down=false;stage.classList.remove('is-dragging');return;}
-      if(Math.hypot(dx,dy)>8) {
+      if(!inspecting && !moved && Math.abs(dy)>Math.abs(dx) && Math.abs(dy)>12 && event.pointerType==='touch') {down=false;stage.classList.remove('is-dragging');return;}
+      if(Math.hypot(dx,dy)>6) {
         moved=true;
         if(!stage.hasPointerCapture(event.pointerId))stage.setPointerCapture(event.pointerId);
         const now=performance.now();const instant=(event.clientX-lastX)/Math.max(now-lastMoveTime,4);
         velocity=velocity*.55+instant*.45;
         lastX=event.clientX;lastMoveTime=now;
-        setTarget(dragOrigin-dx/spacing());
-        if(grabbed>=0){rotations[grabbed].tz=dragRoll+dx/spacing()*145;rotations[grabbed].ty=clamp(dx*.13,-38,38);rotations[grabbed].tx=clamp(-dy*.22,-30,30);}
+        if(!inspecting)setTarget(dragOrigin-dx/spacing());
+        if(grabbed>=0){
+          rotations[grabbed].tz=dragRoll+dx/spacing()*(inspecting?210:240);
+          rotations[grabbed].ty=clamp(dx*.26,-48,48);
+          rotations[grabbed].tx=clamp(-dy*.35,-38,38);
+        }
       }
     });
     const release=()=>{
       if(!down)return;
       down=false;stage.classList.remove('is-dragging');
-      if(moved) {
+      if(moved && !inspecting) {
         const momentum=performance.now()-lastMoveTime<100?clamp(-velocity*.18,-1,1):0;
         target=Math.round(target+momentum);suppressClickUntil=performance.now()+350;
       }
-      rotations.forEach(r=>{r.tx=0;r.ty=0;r.tz=0;});grabbed=-1;
+      if(moved)suppressClickUntil=performance.now()+350;
+      // Settle to the nearest full turn, avoiding a sudden reverse unwind.
+      rotations.forEach(r=>{r.tx=0;r.ty=0;r.tz=Math.round(r.z.value/360)*360;});grabbed=-1;activePointer=null;
     };
     stage.addEventListener('pointerup',release);
     stage.addEventListener('pointercancel',()=>{release();target=Math.round(target);rotations.forEach(r=>{r.tx=r.ty=r.tz=0;});suppressClickUntil=performance.now()+350;});
     // Touch starts with implicit capture on the product link. Ignore its
     // release while transferring capture to the carousel during a swipe.
     stage.addEventListener('lostpointercapture',event=>{if(event.target===stage)release();});
-    stage.addEventListener('pointerleave',()=>{hovered=-1;if(!down)rotations.forEach(r=>{r.tx=r.ty=r.tz=0;});cursor.classList.remove('visible');if(!moved)release();});
+    stage.addEventListener('pointerleave',event=>{if(event.pointerType!=='mouse')return;hovered=-1;if(!down)rotations.forEach(r=>{r.tx=r.ty=r.tz=0;});cursor.classList.remove('visible');if(!moved)release();});
     stage.addEventListener('dragstart',event=>event.preventDefault());
     stage.addEventListener('click',event=>{
       const link=event.target.closest('.craving-treat');
@@ -262,7 +289,7 @@
       const dt=Math.min((time-previousTime)||16,40)/1000;previousTime=time;
       if(active&&!document.hidden&&(!opening||!hasRendered)) {
         hasRendered=true;
-        if(reduced.matches){glide.value=target;glide.velocity=0;}else spring(glide,target,down?30:12,dt);
+        if(reduced.matches){glide.value=target;glide.velocity=0;}else spring(glide,target,down?38:10,dt);
         position=glide.value;
         links.forEach((link,i)=>{
           const distance=mod(i-position+2)-2;
