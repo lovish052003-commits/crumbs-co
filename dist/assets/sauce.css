@@ -1,0 +1,22 @@
+.sauce-card{background:var(--product-tint,#efe5d7)!important}
+.catalog-cutout{object-fit:contain!important;padding:16px;display:block}
+.sauce-pour{position:absolute;inset:var(--sauce-padding,0px);width:calc(100% - 2 * var(--sauce-padding,0px));height:calc(100% - 2 * var(--sauce-padding,0px));overflow:hidden;pointer-events:none;z-index:2;isolation:isolate}
+.sauce-card [class*='_wishlistBtn_'],.sauce-card [class*='_addBtnContainer_']{z-index:4}
+.cutout-product{display:block}
+.sauce-stream{animation:sauce-pour 7s cubic-bezier(.4,0,.2,1) infinite;transform-box:fill-box}
+.sauce-flow{animation:sauce-flow 1.15s linear infinite}
+.sauce-pool{animation:sauce-pool 7s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.sauce-ripple{animation:sauce-ripple 1.8s ease-out infinite;transform-origin:center;transform-box:fill-box}
+.sauce-drip{stroke-dasharray:100;animation:sauce-drip 7s ease-in-out infinite}
+.sauce-drop,.sauce-drop-shine{animation:sauce-drop 7s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.sauce-pour:not(.sauce-live) *{animation-play-state:paused!important}
+.is-dragging .sauce-pour,.treat-is-opening .sauce-pour{opacity:0;transition:opacity .15s}
+.craving-treat .sauce-pour{transform:translateZ(8px)}
+@keyframes sauce-pour{0%,5%{clip-path:inset(0 0 100% 0);opacity:0}12%{opacity:1}32%,78%{clip-path:inset(0);opacity:1}94%,100%{clip-path:inset(100% 0 0);opacity:0}}
+@keyframes sauce-flow{to{stroke-dashoffset:-46}}
+@keyframes sauce-pool{0%,15%,100%{opacity:0;transform:scale(.7)}35%,80%{opacity:.85;transform:scale(1)}}
+@keyframes sauce-ripple{0%{transform:scale(.4);opacity:0}20%{opacity:.6}100%{transform:scale(1.65);opacity:0}}
+@keyframes sauce-drip{0%,28%{stroke-dashoffset:100;opacity:0}35%{opacity:1}70%,86%{stroke-dashoffset:0;opacity:.9}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes sauce-drop{0%,65%{transform:translateY(-7px) scale(.5);opacity:0}76%{transform:translateY(0) scale(1);opacity:1}84%{transform:translateY(27px) scale(.72,1.15);opacity:.9}89%,100%{transform:translateY(40px) scale(.3);opacity:0}}
+@media(max-width:900px){.cutout-gallery{position:relative;top:auto}}
+@media(prefers-reduced-motion:reduce){.sauce-pour{display:none}}

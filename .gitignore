@@ -1,0 +1,5 @@
+.netlify/
+.openai/
+node_modules/
+.env
+.env.*

@@ -1,0 +1,65 @@
+.craving-hero{--craving-tint:#f8f4ed;position:relative;isolation:isolate;height:calc(100svh - 114px);min-height:720px;max-height:1100px;overflow:hidden;background:var(--craving-tint);transition:background 1s;animation:craving-arrive 1s both}
+.craving-top{position:absolute;top:28px;left:5vw;right:5vw;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.craving-top p{font-size:12px;letter-spacing:.13em;color:var(--brown);margin:0}.craving-top>a{font-size:14px;border-bottom:1px solid #6b4b3e66;padding-bottom:5px}
+.craving-headline{position:absolute;top:50px;left:0;right:0;text-align:center;font:400 clamp(80px,8.7vw,155px)/1.2 'Playfair Display',serif;letter-spacing:-.06em;margin:0;color:var(--cocoa);pointer-events:none;white-space:nowrap}
+.craving-headline em{font-weight:400;color:var(--brown)}
+.craving-orbit{position:absolute;width:620px;height:620px;left:50%;top:43%;transform:translate(-50%,-50%);border:1px solid #6b4b3e16;border-radius:50%;pointer-events:none}
+.craving-orbit:after{content:'';position:absolute;inset:35px;border:1px solid #6b4b3e0c;border-radius:50%}
+.craving-stage{position:absolute;inset:160px 0 210px;touch-action:pan-y;cursor:grab;user-select:none;outline-offset:-7px;z-index:3}
+.craving-stage.is-dragging{cursor:grabbing}
+.craving-treat{position:absolute;top:47%;left:50%;width:clamp(320px,35vw,510px);height:100%;max-height:480px;min-height:280px;display:block;will-change:transform;cursor:pointer;-webkit-user-drag:none}
+.craving-treat img{width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(8px 24px 15px #58391f25);will-change:transform}
+.craving-treat:focus-visible{outline-offset:0;border-radius:50%}
+.treat-open-label{position:absolute;bottom:6%;left:50%;transform:translate(-50%,10px);white-space:nowrap;background:var(--cream);padding:8px 15px;border-radius:30px;font-size:12px;opacity:0;transition:opacity .3s,transform .3s;box-shadow:0 3px 14px #241a170c}
+.craving-treat:hover .treat-open-label,.craving-treat:focus-visible .treat-open-label{opacity:1;transform:translate(-50%,0)}
+.is-dragging .treat-open-label{opacity:0!important}
+.craving-spark{position:absolute;font:70px serif;color:var(--brown);pointer-events:none;animation:spin 36s linear infinite;z-index:1}
+.spark-left{left:14%;top:33%}.spark-right{right:17%;top:57%;color:var(--caramel);font-size:42px;animation-direction:reverse}
+.craving-caption{position:absolute;bottom:132px;text-align:center;left:20px;right:20px;pointer-events:none;z-index:4}
+.craving-category{font-size:11px;color:var(--brown);letter-spacing:.16em;text-transform:uppercase;margin:0 0 8px}
+.craving-name{font:400 clamp(30px,3.4vw,48px)/1.18 'Playfair Display',serif;letter-spacing:-.035em;margin:0 0 8px}
+.craving-note{font-size:14px;color:var(--brown);margin:0}
+.craving-actions{position:absolute;bottom:61px;left:0;right:0;display:flex;gap:22px;justify-content:center;align-items:center;z-index:5}
+.craving-discover{font-size:14px;padding:15px 23px;gap:22px}.craving-discover>span{border-left:1px solid #f8f4ed55;padding-left:20px}
+.craving-add{background:none;border:0;border-bottom:1px solid #6b4b3e88;color:var(--cocoa);font:400 14px Inter,sans-serif;padding:7px 0;cursor:pointer;min-width:80px}
+.craving-bottom{position:absolute;bottom:17px;left:5vw;right:5vw;display:flex;justify-content:space-between;align-items:center;z-index:4;font-size:12px;color:var(--brown)}
+.craving-bottom p{margin:0}.drag-symbol{font-size:21px;margin-right:8px;vertical-align:-2px}.craving-bottom>a{border-bottom:1px solid #6b4b3e44;padding-bottom:3px}
+.craving-pagination{display:flex;gap:5px;position:absolute;left:50%;transform:translateX(-50%)}
+.craving-pagination button{border:0;background:transparent;padding:12px 5px;cursor:pointer;display:grid;place-items:center;width:28px;height:36px}
+.craving-pagination span{width:6px;height:6px;display:block;border-radius:8px;background:#6b4b3e45;transition:width .4s,background .4s}
+.craving-pagination [aria-pressed=true] span{width:24px;background:var(--brown)}
+.craving-cursor{pointer-events:none;position:fixed;width:78px;height:78px;border:1px solid #6b4b3e80;background:#f8f4edbb;backdrop-filter:blur(6px);border-radius:50%;z-index:40;display:grid;place-items:center;text-align:center;font-size:11px;line-height:1.3;transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .2s,transform .3s;color:var(--brown)}
+.craving-cursor.visible{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.treat-model{position:absolute;inset:0;display:block;transform-style:preserve-3d;will-change:transform;pointer-events:none}
+.treat-model img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.treat-model .treat-depth{transform:translateZ(-9px);filter:none;opacity:.4}
+.treat-model .treat-front{transform:translateZ(3px);filter:none}
+.craving-treat:after{content:'';position:absolute;left:24%;bottom:4%;width:52%;height:5%;border-radius:50%;background:#58391f25;filter:blur(12px);z-index:-1;pointer-events:none}
+.treat-glint{position:absolute;inset:0;background:radial-gradient(ellipse at var(--glint-x,50%) 24%,#fff9,transparent 55%);opacity:.16;mask-image:var(--cutout);mask-size:contain;mask-repeat:no-repeat;mask-position:center;transform:translateZ(4px);pointer-events:none;mix-blend-mode:soft-light}
+.treat-transition{position:fixed;inset:0;z-index:90;pointer-events:auto}
+.flight-curtain{position:absolute;inset:0;will-change:clip-path,opacity}
+.flight-product{position:fixed;transform-origin:50% 50%;will-change:transform;pointer-events:none}
+.flight-product img{position:absolute;object-fit:contain;filter:drop-shadow(8px 24px 15px #58391f25)}
+.flight-product .treat-depth{filter:brightness(.68) saturate(.8)}
+.treat-is-opening #root{pointer-events:none}
+.treat-is-opening .craving-hero{animation:none}
+.treat-is-opening .craving-cursor{opacity:0}
+.cutout-gallery{background:var(--product-tint,var(--cream));border-radius:48% 48% 8px 8px;overflow:hidden}.cutout-product{object-fit:contain!important;padding:30px;filter:drop-shadow(8px 20px 12px #58391f22);background:transparent}
+.back-to-cravings{grid-column:1/-1;font-size:14px;color:var(--brown);border-bottom:1px solid #6b4b3e60;width:fit-content;padding-bottom:5px;margin-bottom:-12px}
+@keyframes craving-arrive{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:1600px){.craving-stage{inset:190px 0 230px}.craving-caption{bottom:148px}.craving-actions{bottom:75px}}
+@media(max-width:1000px) and (min-width:651px){.craving-headline{font-size:9.5vw;top:75px}.craving-treat{width:46vw;max-height:440px}.craving-stage{inset:155px 0 210px}.spark-left{left:8%}.spark-right{right:8%}.desktop-hint{display:none}}
+@media(max-width:650px){
+ .craving-hero{height:calc(100svh - 140px);min-height:650px;max-height:850px}
+ .craving-top{top:22px;left:24px;right:24px}.craving-top p{font-size:9px;letter-spacing:.08em}.craving-top>a{font-size:12px}
+ .craving-headline{top:69px;font-size:clamp(52px,12.6vw,78px);line-height:1.02;white-space:normal;padding-inline:30px}.craving-headline em{display:block}
+ .craving-stage{inset:178px 0 207px}.craving-treat{width:75vw;min-height:200px;max-height:360px;top:46%}
+ .craving-orbit{width:360px;height:360px;top:44%}.spark-left{left:9%;top:28%;font-size:40px}.spark-right{right:8%;top:57%;font-size:28px}
+ .craving-caption{bottom:136px;left:24px;right:24px}.craving-category{font-size:9px;margin-bottom:7px}.craving-name{font-size:29px;margin-bottom:7px}.craving-note{font-size:12px;line-height:1.5;max-width:310px;margin:auto}
+ .craving-actions{bottom:67px;gap:17px}.craving-discover{padding:14px 17px;font-size:12px;gap:13px}.craving-discover>span{padding-left:13px}.craving-add{font-size:12px;min-width:66px}
+ .craving-bottom{left:24px;right:24px;bottom:15px;font-size:10px}.craving-bottom>a{display:none}.craving-pagination{left:auto;right:58px;transform:none}.desktop-hint{display:none}.drag-symbol{font-size:19px;margin-right:4px}
+ .craving-cursor{display:none}.treat-open-label{font-size:10px;bottom:0}.craving-treat:hover .treat-open-label{opacity:0}
+ .back-to-cravings{margin-bottom:0}.cutout-product{padding:22px}
+}
+@media(max-width:360px){.craving-headline{font-size:48px}.craving-caption{left:15px;right:15px}.craving-name{font-size:27px}.craving-note{font-size:11px}.craving-top p{max-width:120px}.craving-top{align-items:start}.craving-stage{inset:178px 0 215px}}
+@media(prefers-reduced-motion:reduce){.craving-cursor{display:none}.craving-hero{animation:none;transition:none}.craving-treat img,.treat-model{will-change:auto}.treat-depth,.treat-glint{display:none}}
